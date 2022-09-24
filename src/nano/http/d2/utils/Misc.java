@@ -15,6 +15,7 @@ public class Misc {
         theMimeTypes.put("css", "text/css");
         theMimeTypes.put("js", "text/javascript");
         theMimeTypes.put("htm", "text/html");
+        theMimeTypes.put("html", "text/html");
         theMimeTypes.put("txt", "text/plain");
         theMimeTypes.put("asc", "text/plain");
         theMimeTypes.put("gif", "image/gif");
@@ -41,11 +42,11 @@ public class Misc {
         StringTokenizer st = new StringTokenizer(uri, "/ ", true);
         while (st.hasMoreTokens()) {
             String tok = st.nextToken();
-            if (tok.equals("/"))
+            if ("/".equals(tok)) {
                 newUri.append("/");
-            else if (tok.equals(" "))
+            } else if (" ".equals(tok)) {
                 newUri.append("%20");
-            else {
+            } else {
                 try {
                     newUri.append(URLEncoder.encode(tok, "UTF-8"));
                 } catch (Exception ignored) {

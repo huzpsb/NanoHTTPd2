@@ -19,22 +19,25 @@ public class FileServer {
     public static Response serveFile(String uri, Properties header, File homeDir,
                                      boolean allowDirectoryListing) {
         // Make sure we won't die of an exception later
-        if (!homeDir.isDirectory())
+        if (!homeDir.isDirectory()) {
             return new Response(Status.HTTP_INTERNALERROR, Mime.MIME_PLAINTEXT, "INTERNAL ERRROR: serveFile(): given homeDir is not a directory.");
+        }
 
         // Remove URL arguments
         uri = uri.trim().replace(File.separatorChar, '/');
-        if (uri.indexOf('?') >= 0)
+        if (uri.indexOf('?') >= 0) {
             uri = uri.substring(0, uri.indexOf('?'));
+        }
 
         // Prohibit getting out of current directory
-        if (uri.startsWith("..") || uri.endsWith("..") || uri.contains("../"))
+        if (uri.startsWith("..") || uri.endsWith("..") || uri.contains("../")) {
             return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT,
                     "FORBIDDEN: You know why.");
+        }
         File f = new File(homeDir, uri);
-        if (!f.exists())
+        if (!f.exists()) {
             return new Response(Status.HTTP_NOTFOUND, Mime.MIME_PLAINTEXT, "Error 404, file not found.");
-
+        }
         // List the directory, if necessary
         if (f.isDirectory()) {
             // Browsers get confused without '/' after the
@@ -49,21 +52,21 @@ public class FileServer {
             }
 
             // First try index.html and index.htm
-            if (new File(f, "index.html").exists())
+            if (new File(f, "index.html").exists()) {
                 f = new File(homeDir, uri + "/index.html");
-            else if (new File(f, "index.htm").exists())
+            } else if (new File(f, "index.htm").exists()) {
                 f = new File(homeDir, uri + "/index.htm");
-
+            } else if (allowDirectoryListing) {
                 // No index file, list the directory
-            else if (allowDirectoryListing) {
                 String[] files = f.list();
                 StringBuilder msg = new StringBuilder("<html><body><h1>Directory " + uri + "</h1><br/>");
 
                 if (uri.length() > 1) {
                     String u = uri.substring(0, uri.length() - 1);
                     int slash = u.lastIndexOf('/');
-                    if (slash >= 0)
+                    if (slash >= 0) {
                         msg.append("<b><a href=\"").append(uri, 0, slash + 1).append("\">..</a></b><br/>");
+                    }
                 }
 
                 if (files != null) {
@@ -81,25 +84,26 @@ public class FileServer {
                         if (curFile.isFile()) {
                             long len = curFile.length();
                             msg.append(" &nbsp;<font size=2>(");
-                            if (len < 1024)
+                            if (len < 1024) {
                                 msg.append(len).append(" bytes");
-                            else if (len < 1024 * 1024)
+                            } else if (len < 1024 * 1024) {
                                 msg.append(len / 1024).append(".").append(len % 1024 / 10 % 100).append(" KB");
-                            else
+                            } else {
                                 msg.append(len / (1024 * 1024)).append(".").append(len % (1024 * 1024) / 10 % 100).append(" MB");
+                            }
 
                             msg.append(")</font>");
                         }
                         msg.append("<br/>");
-                        if (dir) msg.append("</b>");
+                        if (dir) {
+                            msg.append("</b>");
+                        }
                     }
                 }
-
                 msg.append("</body></html>");
                 return new Response(Status.HTTP_OK, Mime.MIME_HTML, msg.toString());
             } else {
-                return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT,
-                        "FORBIDDEN: No directory listing.");
+                return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT, "FORBIDDEN: No directory listing.");
             }
         }
 
@@ -107,10 +111,12 @@ public class FileServer {
             // Get MIME type from file name extension, if possible
             String mime = null;
             int dot = f.getCanonicalPath().lastIndexOf('.');
-            if (dot >= 0)
+            if (dot >= 0) {
                 mime = Misc.theMimeTypes.get(f.getCanonicalPath().substring(dot + 1).toLowerCase());
-            if (mime == null)
+            }
+            if (mime == null) {
                 mime = Mime.MIME_DEFAULT_BINARY;
+            }
 
             // Support (simple) skipping:
             long startFrom = 0;
@@ -119,8 +125,9 @@ public class FileServer {
                 if (range.startsWith("bytes=")) {
                     range = range.substring("bytes=".length());
                     int minus = range.indexOf('-');
-                    if (minus > 0)
+                    if (minus > 0) {
                         range = range.substring(0, minus);
+                    }
                     try {
                         startFrom = Long.parseLong(range);
                     } catch (Exception ignored) {

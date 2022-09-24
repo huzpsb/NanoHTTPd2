@@ -1,5 +1,6 @@
 package nano.http.d2.core;
 
+import nano.http.d2.hooks.HookManager;
 import nano.http.d2.serve.ServeProvider;
 import nano.http.d2.utils.Mime;
 import nano.http.d2.utils.Misc;
@@ -114,7 +115,7 @@ public class HTTPSession implements Runnable {
 
             // If the method is POST, there may be parameters
             // in data section, too, read it:
-            if (method.equalsIgnoreCase("POST")) {
+            if ("POST".equalsIgnoreCase(method)) {
                 String contentType = "";
                 String contentTypeHeader = header.getProperty("content-type");
                 StringTokenizer st = new StringTokenizer(contentTypeHeader, "; ");
@@ -122,7 +123,7 @@ public class HTTPSession implements Runnable {
                     contentType = st.nextToken();
                 }
 
-                if (contentType.equalsIgnoreCase("multipart/form-data")) {
+                if ("multipart/form-data".equalsIgnoreCase(contentType)) {
                     // Handle multipart/form-data
                     if (!st.hasMoreTokens()) {
                         sendError(Status.HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
@@ -151,7 +152,7 @@ public class HTTPSession implements Runnable {
             }
 
             // Ok, now do the serve()
-            Response r = myServer.serve(uri, method, header, parms, files);
+            Response r = HookManager.hook.serve(uri, method, header, parms, files, myServer);
             if (r == null) {
                 sendError(Status.HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
             } else {

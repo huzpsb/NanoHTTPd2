@@ -28,7 +28,6 @@ public class ExampleServer implements ServeProvider {
             System.out.println("  UPLOADED: '" + value + "' = '" +
                     files.getProperty(value) + "'");
         }
-
         return FileServer.serveFile(uri, header, new File("."), true);
     }
 }
