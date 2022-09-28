@@ -1,4 +1,4 @@
-NanoHTTPd2
+NanoHTTPd2_WIP
 ======================
 A fork of the famous project : NanoHTTPd (https://github.com/gseguin/NanoHTTPd)
 
@@ -19,7 +19,6 @@ When you need it:
 Features & limitations
 ======================
 
-* Only one Java file
 * Released as open source, Modified BSD licence
 * No fixed config files, logging, authorization etc. (Implement by yourself if you need them.)
 * Supports parameter parsing of GET and POST methods
@@ -42,7 +41,7 @@ Ways to use
 ===========
 
 * Run as a standalone app (serves files from current directory and shows requests)
-* Implement serve() and embed to your own program (see HelloServer.java for a simple example)
+* Implement serve() and embed to your own program (see ExampleServer.java for a simple example)
 * Call serveFile() from serve() with your own base directory
 * To test file uploading, try browsing file-upload-test.htm through NanoHTTPd2, upload something and watch the console
   output.
