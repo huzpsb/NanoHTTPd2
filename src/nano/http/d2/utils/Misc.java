@@ -55,4 +55,15 @@ public class Misc {
         }
         return newUri.toString();
     }
+
+    public static String chinese(String text) {
+        return "<html>\n" +
+                "<head>\n" +
+                "    <meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">\n" +
+                "</head>\n" +
+                "<body>\n" +
+                text +
+                "</body>\n" +
+                "</html>";
+    }
 }
