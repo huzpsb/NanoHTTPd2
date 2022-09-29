@@ -45,3 +45,20 @@ Ways to use
 * Call serveFile() from serve() with your own base directory
 * To test file uploading, try browsing file-upload-test.htm through NanoHTTPd2, upload something and watch the console
   output.
+
+Maven usage (Experimental)
+===
+
+```xml
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+	<dependency>
+	    <groupId>com.github.huzpsb</groupId>
+	    <artifactId>NanoHTTPd2</artifactId>
+	    <version>1.2</version>
+	</dependency>
+```
