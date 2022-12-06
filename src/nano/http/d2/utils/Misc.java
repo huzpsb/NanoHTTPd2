@@ -11,6 +11,8 @@ public class Misc {
     public static final ConcurrentHashMap<String, String> theMimeTypes = new ConcurrentHashMap<>();
     public static final SimpleDateFormat gmtFrmt;
 
+    public static final String BOM = "\ufeff";
+
     static {
         theMimeTypes.put("css", "text/css");
         theMimeTypes.put("js", "text/javascript");
