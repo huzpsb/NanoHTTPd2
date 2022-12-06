@@ -45,6 +45,7 @@ Ways to use
 * Call serveFile() from serve() with your own base directory
 * To test file uploading, try browsing file-upload-test.htm through NanoHTTPd2, upload something and watch the console
   output.
+* A fast way to develop dbo-alike workers.
 
 Maven usage (Experimental)
 ===
