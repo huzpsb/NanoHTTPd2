@@ -4,6 +4,8 @@ NanoHTTPd2
 
 “杀鸡别用牛刀；写小型web后端别用企业级框架！”
 
+English Version : https://github.com/huzpsb/NanoHTTPd2/blob/main/README_EN.md
+
 简介
 ======================
 本项目是 NanoHTTPd (https://github.com/gseguin/NanoHTTPd) 的延续版。
