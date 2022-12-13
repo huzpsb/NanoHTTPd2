@@ -111,8 +111,8 @@ public class NanoDb<K, V> {
                 provider.toFile(file + "_", data);
                 File original = new File(file);
                 File temp = new File(file + "_");
-                while (!original.delete()) ;
-                while (!temp.renameTo(original)) ;
+                original.delete();
+                temp.renameTo(original);
             } catch (Exception e) {
                 e.printStackTrace();
             }

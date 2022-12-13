@@ -33,6 +33,7 @@ public class MapSerl<K, V> {
         for (int i = 0; i < item.key.length; i++) {
             map.put((K) item.key[i], (V) item.value[i]);
         }
+        ois.close();
         return map;
     }
 }
