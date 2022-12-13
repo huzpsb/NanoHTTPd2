@@ -1,6 +1,4 @@
-package example.testtube;
-
-import example.advancedDb.Member;
+package example.JSON;
 
 public class Result {
     private final String status;

@@ -1,4 +1,4 @@
-package example.advancedDb;
+package example.Backend;
 
 import java.io.Serializable;
 

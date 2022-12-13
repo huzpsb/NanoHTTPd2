@@ -1,4 +1,4 @@
-package example;
+package example.FileServer;
 
 import nano.http.d2.core.NanoHTTPd;
 import nano.http.d2.serve.ExampleServer;

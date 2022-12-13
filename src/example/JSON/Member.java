@@ -1,4 +1,4 @@
-package example.advancedDb;
+package example.JSON;
 
 import nano.http.d2.json.NanoJSON;
 
