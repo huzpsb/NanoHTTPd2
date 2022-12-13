@@ -1,9 +1,10 @@
 package nano.http.d2.json;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 public class NanoJSON {
+    // Warning! NanoJSON can only serialize objects with basic(int,bool,etc.) or basic[] members!
+    // Or, if necessary, implement toString method as return NanoJSON.asJSON(this,this.class);
     public static String asJSON(Object o, Class<?> clazz) {
         try {
             Field[] allFields = clazz.getDeclaredFields();
@@ -16,20 +17,30 @@ public class NanoJSON {
                 f.setAccessible(true);
                 Object now = f.get(o);
                 sb.append("\"").append(f.getName()).append("\":");
-                if (now instanceof Array) {
+                if (now == null) {
+                    sb.append("null");
+                } else if (now.getClass().isArray()) {
                     sb.append("[");
-                    int length = Array.getLength(o);
-                    for (int i = 0; i < length; i++) {
-                        sb.append(serl(Array.get(o, i)));
+                    Object[] oa = (Object[]) now;
+                    for (Object value : oa) {
+                        sb.append(serl(value));
                         sb.append(",");
                     }
-                    sb.append("]");
+                    if (sb.charAt(sb.length() - 1) == ',') {
+                        sb.setCharAt(sb.length() - 1, ']');
+                    } else {
+                        sb.append("]");
+                    }
                 } else {
                     sb.append(serl(now));
                 }
                 sb.append(",");
             }
-            sb.append("}");
+            if (sb.charAt(sb.length() - 1) == ',') {
+                sb.setCharAt(sb.length() - 1, '}');
+            } else {
+                sb.append("}");
+            }
             return sb.toString();
         } catch (Exception e) {
             return "{}";
@@ -37,8 +48,10 @@ public class NanoJSON {
     }
 
     private static String serl(Object o) {
-        if (o instanceof String) {
-            return "\"" + (String) o + "\"";
+        if (o == null) {
+            return "null";
+        } else if (o instanceof String) {
+            return "\"" + o + "\"";
         } else {
             return o.toString();
         }

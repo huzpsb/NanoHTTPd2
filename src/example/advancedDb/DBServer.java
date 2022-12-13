@@ -39,7 +39,9 @@ public class DBServer implements ServeProvider {
                     r.addHeader("Content-Disposition", "attachment; filename=\"download.csv\"");
                     return r;
                 case "/query":
-                    return new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
+                    Response r2 = new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
+                    r2.addHeader("Access-Control-Allow-Origin", "*");
+                    return r2;
                 default:
                     System.out.println(uri);
                     return new Response(Status.HTTP_NOTFOUND, Mime.MIME_PLAINTEXT, "Not found");
