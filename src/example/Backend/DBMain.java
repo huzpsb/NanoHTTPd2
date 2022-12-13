@@ -9,7 +9,7 @@ public class DBMain {
         NanoHTTPd server = new NanoHTTPd(80, new DBServer());
         System.out.println("Hello world!");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            DBServer.udb.save();
+            DBServer.udb.save2();
             System.out.println("Data saved~!");
         }));
         new Scanner(System.in).nextLine();

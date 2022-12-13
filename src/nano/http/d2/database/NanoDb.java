@@ -7,6 +7,7 @@ import nano.http.d2.utils.Misc;
 
 import java.io.File;
 import java.io.StreamCorruptedException;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,8 +83,34 @@ public class NanoDb<K, V> {
     private void scheduleSave() {
         operations++;
         if (operations >= buffer && System.currentTimeMillis() - lastSave >= save) {
-            save();
+            long t = System.currentTimeMillis();
+            save2();
+            //save();
+            System.out.println("save " + (System.currentTimeMillis() - t));
         }
+    }
+
+    public void save2(){
+        operations = 0;
+        lastSave = System.currentTimeMillis();
+        new Thread(new Runnable() {
+            Set<Map.Entry<K, V>> entries = data.entrySet();
+            @Override
+            public void run() {
+                if (!locked) {
+                    locked = true;
+                    try {
+                        provider.toFile(file + "_", entries);
+                        provider.toFile(file, entries);
+                        //noinspection ResultOfMethodCallIgnored
+                        new File(file + "_").delete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    locked = false;
+                }
+            }
+        }).start();
     }
 
     public void save() {
