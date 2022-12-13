@@ -101,9 +101,10 @@ public class NanoDb<K, V> {
                     locked = true;
                     try {
                         provider.toFile(file + "_", entries);
-                        provider.toFile(file, entries);
                         //noinspection ResultOfMethodCallIgnored
-                        new File(file + "_").delete();
+                        new File(file).delete();
+                        //noinspection ResultOfMethodCallIgnored
+                        new File(file + "_").renameTo(new File(file));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
