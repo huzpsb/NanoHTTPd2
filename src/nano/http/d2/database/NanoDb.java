@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.StreamCorruptedException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("unused")
 public class NanoDb<K, V> {
@@ -17,9 +18,9 @@ public class NanoDb<K, V> {
     private final MapSerl<K, V> provider = new MapSerl<>();
     private final ConcurrentHashMap<K, V> data;
     private final String file;
+    private final AtomicBoolean locked = new AtomicBoolean(false);
     private long lastSave = System.currentTimeMillis();
     private int operations = 0;
-    private volatile boolean locked = false;
 
     public NanoDb(String datafile) throws Exception {
         this(datafile, 60000L, 10);
@@ -80,26 +81,36 @@ public class NanoDb<K, V> {
     }
 
     private void scheduleSave() {
+        while (locked.get()) {
+            try {
+                //noinspection BusyWait
+                Thread.sleep(1L);
+            } catch (Exception ignored) {
+
+            }
+        }
         operations++;
         if (operations >= buffer && System.currentTimeMillis() - lastSave >= save) {
             save();
         }
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void save() {
-        if (!locked) {
-            locked = true;
+        if (!locked.get()) {
+            locked.set(true);
             try {
                 lastSave = System.currentTimeMillis();
                 operations = 0;
                 provider.toFile(file + "_", data);
-                provider.toFile(file, data);
-                //noinspection ResultOfMethodCallIgnored
-                new File(file + "_").delete();
+                File original = new File(file);
+                File temp = new File(file + "_");
+                while (!original.delete()) ;
+                while (!temp.renameTo(original)) ;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            locked = false;
+            locked.set(false);
         }
     }
 }
