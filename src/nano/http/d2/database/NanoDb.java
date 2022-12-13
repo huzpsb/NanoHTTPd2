@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "BusyWait"})
 public class NanoDb<K, V> {
     private final long save;
     private final int buffer;
@@ -62,6 +62,12 @@ public class NanoDb<K, V> {
         return this.data.size();
     }
 
+    // Attention!
+    // Concurrent means that if an operation contains no more than one K-V, you may consider it thread-safe.
+    // However, when you need to iterate the whole database, you need to LOCK it!
+    // There is an example in toCSV.
+    // Also, if you're sure that there's only one thread, you can ignore this.
+
     public Set<K> list() {
         return this.data.keySet();
     }
@@ -69,6 +75,7 @@ public class NanoDb<K, V> {
     public String toCSV(Class<?> CBase, String indexName, Localizer l) {
         StringBuilder sb = new StringBuilder();
         Reflectior<V> ref = new Reflectior<>(CBase);
+        waitAndLock();
         Set<K> index = this.list();
         sb.append(Misc.BOM);
         sb.append("\"").append(indexName).append("\",");
@@ -77,16 +84,15 @@ public class NanoDb<K, V> {
             sb.append("\"").append(now.toString()).append("\",");
             sb.append(ref.serl(this.query(now)));
         }
+        locked.set(false);
         return sb.toString();
     }
 
     private void scheduleSave() {
         while (locked.get()) {
             try {
-                //noinspection BusyWait
                 Thread.sleep(1L);
             } catch (Exception ignored) {
-
             }
         }
         operations++;
@@ -112,5 +118,30 @@ public class NanoDb<K, V> {
             }
             locked.set(false);
         }
+    }
+
+    public boolean isLocked() {
+        return locked.get();
+    }
+
+    public void waitAndLock() {
+        while (!lock()) {
+            try {
+                Thread.sleep(1L);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    public boolean lock() {
+        if (locked.get()) {
+            return false;
+        }
+        locked.set(true);
+        return true;
+    }
+
+    public boolean unlock() {
+        return locked.getAndSet(false);
     }
 }
