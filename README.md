@@ -23,6 +23,8 @@ English Version : https://github.com/huzpsb/NanoHTTPd2/blob/main/README_EN.md
 
 （不要跟我讲数据量特别、特别大的时候的性能。你代码有多少人用你自己不清楚？Spring的确适合企业开发，但是一个中学的评教系统啊之类的真的就没必要了好吧。）
 
+Edit:进行了一次压力测试。测试接口为DBServer的/create接口。 100线程，每个线程1k次调用。耗时67s，相当于每次调用0.67ms。100k个记录总没话说了吧？67秒里面是有一次save的，线程安全也没有问题。TwT
+
 框架特色
 ======================
 
