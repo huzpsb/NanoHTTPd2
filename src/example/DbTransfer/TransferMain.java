@@ -9,6 +9,7 @@ public class TransferMain {
     public static void main(String[] args) throws Exception {
         NanoDb<String, User> udb = new NanoDb<>("students.udb");
         NanoDb<String, NewUser> udb2 = new NanoDb<>("students2.udb");
+        System.out.println(udb.size());
         for (String now : udb.list()) {
             udb2.set(now, (NewUser) Transfer.copy(udb.query(now), new NewUser()));
         }

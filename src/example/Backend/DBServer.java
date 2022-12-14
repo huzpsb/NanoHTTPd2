@@ -21,7 +21,6 @@ public class DBServer implements ServeProvider {
     }
 
     @Override
-
     public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
         try {
             switch (uri) {
@@ -47,7 +46,7 @@ public class DBServer implements ServeProvider {
                     return new Response(Status.HTTP_NOTFOUND, Mime.MIME_PLAINTEXT, "Not found");
             }
         } catch (Exception e) {
-            return new Response(Status.HTTP_INTERNALERROR, Mime.MIME_PLAINTEXT, e.getMessage());
+            return new Response(Status.HTTP_INTERNALERROR, Mime.MIME_PLAINTEXT, "Mal-formatted request!");
         }
     }
 }
