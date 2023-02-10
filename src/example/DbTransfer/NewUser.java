@@ -13,6 +13,7 @@ import java.io.Serializable;
 // Do not:
 // Directly modify the old class
 // Rename , change the package of the old class
+// Change the type of fields
 
 public class NewUser implements Serializable {
     private static final long serialVersionUID = 43432325L;

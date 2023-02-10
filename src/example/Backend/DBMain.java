@@ -1,20 +1,22 @@
 package example.Backend;
 
+import nano.http.d2.console.Console;
+import nano.http.d2.console.Logger;
 import nano.http.d2.core.NanoHTTPd;
-
-import java.util.Scanner;
 
 public class DBMain {
     public static void main(String[] args) throws Exception {
-        NanoHTTPd server = new NanoHTTPd(80, new DBServer());
-        System.out.println("Hello world!");
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        new NanoHTTPd(80, new DBServer());
+        Logger.info("API Server started on port 80");
+        Console.register("stop", () -> {
             DBServer.udb.save();
-            System.out.println("Data saved~!");
-        }));
-        new Scanner(System.in).nextLine();
-        server.stop();
-        System.out.println("Bye world!");
-        System.exit(0);
+            // Do save the data before exit.
+            // Or you will lose recent changes.
+
+            Logger.info("Data saved ~ !");
+            System.exit(0);
+            // Compared against FileServer, we chose to exit the program directly here.
+            // And it's strongly recommended to do alike this, as the program will exit immediately.
+        });
     }
 }

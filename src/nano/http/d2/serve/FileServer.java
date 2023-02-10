@@ -30,9 +30,8 @@ public class FileServer {
         }
 
         // Prohibit getting out of current directory
-        if (uri.startsWith("..") || uri.endsWith("..") || uri.contains("../")) {
-            return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT,
-                    "FORBIDDEN: You know why.");
+        if (uri.contains("..")) {
+            return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT, "FORBIDDEN: You know why.");
         }
         File f = new File(homeDir, uri);
         if (!f.exists()) {
@@ -100,7 +99,7 @@ public class FileServer {
                         }
                     }
                 }
-                msg.append("</body></html>");
+                msg.append("<br/>Powered by NanoHTTPd2</body></html>");
                 return new Response(Status.HTTP_OK, Mime.MIME_HTML, msg.toString());
             } else {
                 return new Response(Status.HTTP_FORBIDDEN, Mime.MIME_PLAINTEXT, "FORBIDDEN: No directory listing.");

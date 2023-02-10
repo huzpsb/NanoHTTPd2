@@ -3,6 +3,10 @@ package nano.http.d2.json;
 import java.lang.reflect.Field;
 
 public class NanoJSON {
+    public static String asJSON(Object o) {
+        return asJSON(o, o.getClass());
+    }
+
     // Warning! NanoJSON can only serialize objects with basic(int,bool,etc.) or basic[] members!
     // Or, if necessary, implement toString method as return NanoJSON.asJSON(this,this.class);
     public static String asJSON(Object o, Class<?> clazz) {
@@ -16,7 +20,7 @@ public class NanoJSON {
                 }
                 f.setAccessible(true);
                 Object now = f.get(o);
-                sb.append("\"").append(f.getName()).append("\":");
+                sb.append(f.getName()).append(":");
                 if (now == null) {
                     sb.append("null");
                 } else if (now.getClass().isArray()) {

@@ -1,5 +1,9 @@
 package nano.http.d2.database.internal;
 
+import nano.http.d2.console.Console;
+import nano.http.d2.console.Logger;
+import nano.http.d2.database.Transfer;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -26,12 +30,31 @@ public class MapSerl<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public ConcurrentHashMap<K, V> fromFile(String f) throws Exception {
+    public ConcurrentHashMap<K, V> fromFile(String f, Class<?> clazz) throws Exception {
+        boolean changed = false;
         ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
         SerlItem item = (SerlItem) ois.readObject();
         for (int i = 0; i < item.key.length; i++) {
-            map.put((K) item.key[i], (V) item.value[i]);
+            if (clazz != null) {
+                if (item.value[i].getClass().getName().equals(clazz.getName())) {
+                    map.put((K) item.key[i], (V) item.value[i]);
+                } else {
+                    if (!changed) {
+                        changed = true;
+                        Logger.warning("Are you sure that you want to convert the database? (yes/no)");
+                        Logger.warning("This operation is not reversible.");
+                        Logger.warning("Cast " + item.value[i].getClass().getName() + " -> " + clazz.getName());
+                        if (!"yes".equalsIgnoreCase(Console.await())) {
+                            Logger.error("Aborted.");
+                            System.exit(1);
+                        }
+                    }
+                    map.put((K) item.key[i], (V) Transfer.copy(item.value[i], clazz.getConstructor().newInstance()));
+                }
+            } else {
+                map.put((K) item.key[i], (V) item.value[i]);
+            }
         }
         ois.close();
         return map;

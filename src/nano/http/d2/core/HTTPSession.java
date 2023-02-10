@@ -1,5 +1,6 @@
 package nano.http.d2.core;
 
+import nano.http.d2.console.Logger;
 import nano.http.d2.hooks.HookManager;
 import nano.http.d2.serve.ServeProvider;
 import nano.http.d2.utils.Mime;
@@ -356,7 +357,7 @@ public class HTTPSession implements Runnable {
                 fstream.close();
                 path = temp.getAbsolutePath();
             } catch (Exception e) { // Catch exception if any
-                System.err.println("Error: " + e.getMessage());
+                Logger.error("Error: " + e.getMessage());
             }
         }
         return path;

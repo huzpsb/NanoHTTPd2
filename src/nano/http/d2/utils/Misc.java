@@ -15,6 +15,7 @@ public class Misc {
 
     static {
         theMimeTypes.put("css", "text/css");
+        theMimeTypes.put("java", "text/java");
         theMimeTypes.put("js", "text/javascript");
         theMimeTypes.put("htm", "text/html");
         theMimeTypes.put("html", "text/html");

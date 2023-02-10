@@ -1,29 +1,31 @@
 NanoHTTPd2
 ======================
-新一代中小型后端个人/小团队开发框架
+新一代中小型后端开发框架
 
 “杀鸡别用牛刀；写小型web后端别用企业级框架！”
 
-English Version : https://github.com/huzpsb/NanoHTTPd2/blob/main/README_EN.md
+Version 1.5
 
 简介
 ======================
 本项目是 NanoHTTPd (https://github.com/gseguin/NanoHTTPd) 的延续版。
 
-同时，加入了很多~~摸鱼~~简化小型项目开发难度的功能。
+同时，加入了很多~~方便外包人摸鱼~~简化小型项目开发难度的功能。
 
 功能亮点
 ======================
 
-* 伪数据库。能够直接把ConcurrentHashMap（前提是Key和Value都可以序列化）当作数据库使用。
+* 伪数据库。能够直接把ConcurrentHashMap（前提是Key和Value都可以序列化）当作数据库使用；甚至可以在不同版本的序列化对象中自动互相转换。
 * 伪JSON。可以把简单对象直接作为JSON格式返回。
 * CSV导出。可以导出所有数据为CSV表格。自动添加表头。
 * 多线程。全自动多线程香不香？
 * 文件支持。能够处理含文件的POST/GET请求；有FileServer工具类，可以简单轻松的提供本地文件。
+* Logger与Console。摆脱庞大而臃肿还爆出过RCE的Log4j！
 
 （不要跟我讲数据量特别、特别大的时候的性能。你代码有多少人用你自己不清楚？Spring的确适合企业开发，但是一个中学的评教系统啊之类的真的就没必要了好吧。）
 
-Edit:进行了一次压力测试。测试接口为DBServer的/create接口。 100线程，每个线程1k次调用。耗时67s，相当于每次调用0.67ms，失败次数0。100k个记录总没话说了吧？67秒里面是有一次save的，线程安全也没有问题。TwT
+Edit:进行了一次压力测试。测试接口为DBServer的/create接口。
+100线程，每个线程1k次调用。耗时67s，相当于每次调用0.67ms，失败次数0。100k个记录总没话说了吧？67秒里面是有一次save的，线程安全也没有问题。TwT
 
 框架特色
 ======================
@@ -35,6 +37,7 @@ Edit:进行了一次压力测试。测试接口为DBServer的/create接口。 10
 ````java
 package example.Backend;
 
+import nano.http.d2.console.Logger;
 import nano.http.d2.core.Response;
 import nano.http.d2.database.NanoDb;
 import nano.http.d2.json.NanoJSON;
@@ -73,16 +76,21 @@ public class DBServer implements ServeProvider {
                     r.addHeader("Content-Disposition", "attachment; filename=\"download.csv\"");
                     return r;
                 case "/query":
-                    return new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
+                    Response r2 = new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
+                    r2.addHeader("Access-Control-Allow-Origin", "*");
+                    return r2;
                 default:
-                    System.out.println(uri);
+                    Logger.warning(uri);
+                    // Please read the notes in ExampleServer.java (package: nano.http.d2.serve)
+                    // You may want to use FileServer.serveFile() here!
                     return new Response(Status.HTTP_NOTFOUND, Mime.MIME_PLAINTEXT, "Not found");
             }
         } catch (Exception e) {
-            return new Response(Status.HTTP_INTERNALERROR, Mime.MIME_PLAINTEXT, e.getMessage());
+            return new Response(Status.HTTP_INTERNALERROR, Mime.MIME_PLAINTEXT, "Mal-formatted request!");
         }
     }
 }
+
 ````
 
 ````
@@ -121,7 +129,7 @@ name - 学生名称
 name - 学生名称
 返回：
 json - 成功
-例子: {"age":15,"home":"BeiJing",}
+例子: {age:15,home:"BeiJing"}
 其他 - 失败原因
 
 伪数据库会被保存至“students.udb”文件。

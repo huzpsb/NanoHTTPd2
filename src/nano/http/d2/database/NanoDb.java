@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SuppressWarnings({"unused", "BusyWait"})
+@SuppressWarnings({"unused", "BusyWait", "ResultOfMethodCallIgnored"})
 public class NanoDb<K, V> {
     private final long save;
     private final int buffer;
@@ -23,10 +23,18 @@ public class NanoDb<K, V> {
     private int operations = 0;
 
     public NanoDb(String datafile) throws Exception {
-        this(datafile, 60000L, 10);
+        this(datafile, 60000L, 10, null);
     }
 
     public NanoDb(String datafile, long saveInterval, int bufferSize) throws Exception {
+        this(datafile, saveInterval, bufferSize, null);
+    }
+
+    public NanoDb(String datafile, Class<?> classV) throws Exception {
+        this(datafile, 60000L, 10, classV);
+    }
+
+    public NanoDb(String datafile, long saveInterval, int bufferSize, Class<?> classV) throws Exception {
         save = saveInterval;
         buffer = bufferSize;
         file = datafile;
@@ -36,7 +44,7 @@ public class NanoDb<K, V> {
         if (!new File(file).exists()) {
             data = new ConcurrentHashMap<>();
         } else {
-            data = provider.fromFile(datafile);
+            data = provider.fromFile(datafile, classV);
         }
     }
 
@@ -101,7 +109,6 @@ public class NanoDb<K, V> {
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public void save() {
         if (!locked.get()) {
             locked.set(true);

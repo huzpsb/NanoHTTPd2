@@ -1,5 +1,6 @@
 package example.Backend;
 
+import nano.http.d2.console.Logger;
 import nano.http.d2.core.Response;
 import nano.http.d2.database.NanoDb;
 import nano.http.d2.json.NanoJSON;
@@ -42,7 +43,9 @@ public class DBServer implements ServeProvider {
                     r2.addHeader("Access-Control-Allow-Origin", "*");
                     return r2;
                 default:
-                    System.out.println(uri);
+                    Logger.warning(uri);
+                    // Please read the notes in ExampleServer.java (package: nano.http.d2.serve)
+                    // You may want to use FileServer.serveFile() here!
                     return new Response(Status.HTTP_NOTFOUND, Mime.MIME_PLAINTEXT, "Not found");
             }
         } catch (Exception e) {
