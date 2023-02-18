@@ -7,6 +7,14 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*
+ * Attention !
+ * This file is designed to be used internally by NanoHTTPD.
+ * To make FileServer work efficiently, this file is not written in a modular way.
+ * It's not recommended to use this file in your own project.
+ * Use other files in this package as alternatives.
+ */
+
 public class Misc {
     public static final ConcurrentHashMap<String, String> theMimeTypes = new ConcurrentHashMap<>();
     public static final SimpleDateFormat gmtFrmt;

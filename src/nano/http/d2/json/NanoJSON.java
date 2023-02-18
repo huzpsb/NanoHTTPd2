@@ -15,7 +15,7 @@ public class NanoJSON {
             StringBuilder sb = new StringBuilder();
             sb.append("{");
             for (Field f : allFields) {
-                if (f.getName().equals("serialVersionUID")) {
+                if (shouldIgnore(f)) {
                     continue;
                 }
                 f.setAccessible(true);
@@ -51,6 +51,27 @@ public class NanoJSON {
         }
     }
 
+    public static String asURI(Object o) {
+        try {
+            Class<?> clazz = o.getClass();
+            Field[] allFields = clazz.getDeclaredFields();
+            StringBuilder sb = new StringBuilder();
+            for (Field f : allFields) {
+                if (shouldIgnore(f)) {
+                    continue;
+                }
+                f.setAccessible(true);
+                Object now = f.get(o);
+                sb.append(f.getName()).append("=").append(now);
+                sb.append("&");
+            }
+            sb.delete(sb.length() - 1, sb.length());
+            return sb.toString();
+        } catch (Exception e) {
+            return "{}";
+        }
+    }
+
     private static String serl(Object o) {
         if (o == null) {
             return "null";
@@ -59,5 +80,15 @@ public class NanoJSON {
         } else {
             return o.toString();
         }
+    }
+
+    private static boolean shouldIgnore(Field f) {
+        //Ignore serialVersionUID
+        if (f.getName().equals("serialVersionUID")) {
+            return true;
+        }
+
+        //Check if the field is static
+        return (f.getModifiers() & 0x00000008) != 0;
     }
 }

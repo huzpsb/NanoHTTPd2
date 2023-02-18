@@ -1,11 +1,11 @@
 package nano.http.d2.core;
 
 import nano.http.d2.console.Logger;
+import nano.http.d2.consts.Mime;
+import nano.http.d2.consts.Status;
 import nano.http.d2.hooks.HookManager;
 import nano.http.d2.serve.ServeProvider;
-import nano.http.d2.utils.Mime;
 import nano.http.d2.utils.Misc;
-import nano.http.d2.utils.Status;
 
 import java.io.*;
 import java.net.Socket;
@@ -56,7 +56,7 @@ public class HTTPSession implements Runnable {
             decodeHeader(hin, pre, parms, header);
             String method = pre.getProperty("method");
             String uri = pre.getProperty("uri");
-
+            Logger.info(method + " " + uri + " (" + mySocket.getInetAddress().getHostAddress() + ")");
             long size = 0x7FFFFFFFFFFFFFFFL;
             String contentLength = header.getProperty("content-length");
             if (contentLength != null) {
@@ -137,7 +137,7 @@ public class HTTPSession implements Runnable {
                     st.nextToken();
                     String boundary = st.nextToken();
 
-                    decodeMultipartData(boundary, fbuf, in, parms, files);
+                    decodeMultipartData(boundary, fbuf, in, parms, files, uri);
                 } else {
                     // Handle application/x-www-form-urlencoded
                     StringBuilder postLine = new StringBuilder();
@@ -153,7 +153,7 @@ public class HTTPSession implements Runnable {
             }
 
             // Ok, now do the serve()
-            Response r = HookManager.hook.serve(uri, method, header, parms, files, myServer);
+            Response r = HookManager.requestHook.serve(uri, method, header, parms, files, myServer);
             if (r == null) {
                 sendError(Status.HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
             } else {
@@ -237,7 +237,7 @@ public class HTTPSession implements Runnable {
      * Decodes the Multipart Body data and put it
      * into java Properties' key - value pairs.
      */
-    private void decodeMultipartData(String boundary, byte[] fbuf, BufferedReader in, Properties parms, Properties files)
+    private void decodeMultipartData(String boundary, byte[] fbuf, BufferedReader in, Properties parms, Properties files, String uri)
             throws InterruptedException {
         try {
             int[] bpositions = getBoundaryPositions(fbuf, boundary.getBytes());
@@ -293,8 +293,10 @@ public class HTTPSession implements Runnable {
                             sendError(Status.HTTP_INTERNALERROR, "Error processing request");
                         }
                         int offset = stripMultipartHeaders(fbuf, bpositions[boundarycount - 2]);
-                        String path = saveTmpFile(fbuf, offset, bpositions[boundarycount - 1] - offset - 4);
-                        files.put(pname, path);
+                        if (HookManager.fileHook.Accept(pname, uri)) {
+                            String path = saveTmpFile(fbuf, offset, bpositions[boundarycount - 1] - offset - 4);
+                            files.put(pname, path);
+                        }
                         value = new StringBuilder(disposition.getProperty("filename"));
                         value = new StringBuilder(value.substring(1, value.length() - 1));
                         do {

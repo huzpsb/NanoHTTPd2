@@ -1,5 +1,6 @@
 package nano.http.d2.core;
 
+import nano.http.d2.hooks.HookManager;
 import nano.http.d2.serve.ServeProvider;
 
 import java.io.IOException;
@@ -16,6 +17,10 @@ public class NanoHTTPd {
             try {
                 while (true) {
                     Socket s = myServerSocket.accept();
+                    if (!HookManager.socketHook.Accept(s.getInetAddress().getHostAddress())) {
+                        s.close();
+                        continue;
+                    }
                     new HTTPSession(s, server);
                 }
             } catch (IOException ignored) {

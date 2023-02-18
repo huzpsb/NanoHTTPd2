@@ -1,5 +1,7 @@
 package nano.http.d2.core;
 
+import nano.http.d2.hooks.HookManager;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +37,7 @@ public class Response {
         this.status = status;
         this.mimeType = mimeType;
         this.data = data;
+        HookManager.headerHook.process(this);
     }
 
     /**
@@ -42,9 +45,7 @@ public class Response {
      * given text.
      */
     public Response(String status, String mimeType, String txt) {
-        this.status = status;
-        this.mimeType = mimeType;
-        this.data = new ByteArrayInputStream(txt.getBytes(StandardCharsets.UTF_8));
+        this(status, mimeType, new ByteArrayInputStream(txt.getBytes(StandardCharsets.UTF_8)));
     }
 
     /**

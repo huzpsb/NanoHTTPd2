@@ -1,12 +1,12 @@
 package example.Backend;
 
 import nano.http.d2.console.Logger;
+import nano.http.d2.consts.Mime;
+import nano.http.d2.consts.Status;
 import nano.http.d2.core.Response;
 import nano.http.d2.database.NanoDb;
 import nano.http.d2.json.NanoJSON;
 import nano.http.d2.serve.ServeProvider;
-import nano.http.d2.utils.Mime;
-import nano.http.d2.utils.Status;
 
 import java.util.Properties;
 
@@ -39,9 +39,7 @@ public class DBServer implements ServeProvider {
                     r.addHeader("Content-Disposition", "attachment; filename=\"download.csv\"");
                     return r;
                 case "/query":
-                    Response r2 = new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
-                    r2.addHeader("Access-Control-Allow-Origin", "*");
-                    return r2;
+                    return new Response(Status.HTTP_OK, Mime.MIME_JSON, NanoJSON.asJSON(udb.query(parms.getProperty("name")), User.class));
                 default:
                     Logger.warning(uri);
                     // Please read the notes in ExampleServer.java (package: nano.http.d2.serve)

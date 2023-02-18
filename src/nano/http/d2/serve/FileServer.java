@@ -1,9 +1,9 @@
 package nano.http.d2.serve;
 
+import nano.http.d2.consts.Mime;
+import nano.http.d2.consts.Status;
 import nano.http.d2.core.Response;
-import nano.http.d2.utils.Mime;
 import nano.http.d2.utils.Misc;
-import nano.http.d2.utils.Status;
 
 import java.io.File;
 import java.io.FileInputStream;
